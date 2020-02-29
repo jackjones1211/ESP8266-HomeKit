@@ -210,6 +210,7 @@ void user_init(void)
     hkc_init("HomeACcessory");
  //   os_printf("end of user_init @ %d\n",system_get_time()/1000);
     os_printf("end of user_init @ %d\n",system_get_time()/1000);
+    //测试代码
 }
 
 /***********************************************************************************
