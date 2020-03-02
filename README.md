@@ -1,7 +1,7 @@
 # ESP8266-HomeKit
 Iphone 控制ESP8266 IO口
 
-本案例使用ESP8266_RTOS_SDK 2.0 小黄板
+本案例使用ESP8266_RTOS_SDK 2.0 小黄板 32Bit Flash
 
 ESP8266-HomeKit的制作说明
 先决条件
