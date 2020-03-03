@@ -1,7 +1,6 @@
 /*
- *  Copyright 2016 HomeACcessoryKid - HacK - homeaccessorykid@gmail.com
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  Licensed under the Apache License, Version 2.0 (the "License")
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -80,6 +79,8 @@ struct  gpio {
     int aid;
     int iid;
 } gpio2;
+
+
 
 void    led_task(void *arg) //make transfer of gpio via arg, starting as a static variable in led routine
 {
@@ -224,7 +225,11 @@ void user_init(void)
 
 
     os_printf("start of user_init @ %d\n",system_get_time()/1000);
-    
+	
+    /* need to set opmode before you set config */
+    wifi_set_opmode(STATION_MODE);
+    xTaskCreate(smartconfig_task, "smartconfig_task", 256, NULL, tskIDLE_PRIORITY+3, NULL);
+
 //use this block only once to set your favorite access point or put your own selection routine
 /*    wifi_set_opmode(STATION_MODE); 
     struct station_config *sconfig = (struct station_config *)zalloc(sizeof(struct station_config));
