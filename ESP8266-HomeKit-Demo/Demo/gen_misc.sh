@@ -40,9 +40,10 @@ echo makeflash
 #./bin/esp_init_data_default.bin 0x3fe000 
 #./bin/blank.bin 0x01000 
 #./bin/upgrade/user1.4096.new.6.bin
-esptool.py --baud 230400 -p /dev/tty.SLAB_USBtoUART write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x14000 $BIN_PATH/eagle.irom0text.bin
+esptool.py --baud 230400 -p /dev/tty.SLAB_USBtoUART write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x10000 $BIN_PATH/eagle.irom0text.bin 0x3FE000 $BIN_PATH/blank.bin 0x3FC000 $BIN_PATH/esp_init_data_default.bin
 echo flash 
 
 date
 ls -l $BIN_PATH/eagle.[if]*
-echo ../../../esptool/esptool.py --baud 230400 -p /dev/cu.usbserial-* write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x14000 $BIN_PATH/eagle.irom0text.bin
+echo ../../../esptool/esptool.py --baud 230400 -p /dev/cu.usbserial-* write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x10000 $BIN_PATH/eagle.irom0text.bin 0x3FE000 $BIN_PATH/blank.bin 0x3FC000 $BIN_PATH/esp_init_data_default.bin
+

@@ -1,4 +1,12 @@
 /*
+ * @Author: jack
+ * @Date: 2020-03-03 21:05:27
+ * @LastEditTime: 2020-03-04 20:20:50
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /ESP8266-HomeKit/ESP8266-HomeKit-Demo/Demo/user/user_main.c
+ */
+/*
  *
  *  Licensed under the Apache License, Version 2.0 (the "License")
  *  you may not use this file except in compliance with the License.
@@ -68,10 +76,17 @@
 *****************************************************************************************/
  
 #include "esp_common.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "freertos/portmacro.h"
+
 #include "hkc.h"
 #include "gpio.h"
 #include "queue.h"
 #include "uart.h"
+#include "smart.h"
 
 xQueueHandle identifyQueue;
 
@@ -204,6 +219,25 @@ void    hkc_user_init(char *accname)
 //  }
 }
 
+/**
+ * @description: Uart0 配置波特率为 115200
+ * @param none
+ * @return: none
+ */
+void Uart0_Config(void)
+{
+     UART_ConfigTypeDef uart_config;
+    uart_config.baud_rate = BIT_RATE_115200;
+    uart_config.data_bits = UART_WordLength_8b;
+    uart_config.parity = USART_Parity_None;
+    uart_config.stop_bits = USART_StopBits_1;
+    uart_config.flow_ctrl = USART_HardwareFlowControl_None;
+    uart_config.UART_RxFlowThresh = 120;
+    uart_config.UART_InverseMask = UART_None_Inverse;
+    UART_ParamConfig(UART0, &uart_config);
+}
+
+
 /******************************************************************************
  * FunctionName : user_init
  * Description  : entry of user application, init user function here
@@ -213,17 +247,7 @@ void    hkc_user_init(char *accname)
 void user_init(void)
 {   
    
-    UART_ConfigTypeDef uart_config;
-    uart_config.baud_rate = BIT_RATE_115200;
-    uart_config.data_bits = UART_WordLength_8b;
-    uart_config.parity = USART_Parity_None;
-    uart_config.stop_bits = USART_StopBits_1;
-    uart_config.flow_ctrl = USART_HardwareFlowControl_None;
-    uart_config.UART_RxFlowThresh = 120;
-    uart_config.UART_InverseMask = UART_None_Inverse;
-    UART_ParamConfig(UART0, &uart_config);
-
-
+    Uart0_Config();
     os_printf("start of user_init @ %d\n",system_get_time()/1000);
 	
     /* need to set opmode before you set config */
