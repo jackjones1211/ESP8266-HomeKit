@@ -1,5 +1,5 @@
 # ESP8266-HomeKit
-Iphone 控制ESP8266 IO口
+Iphone 控制ESP8266 IO口 支持ESPtouch Smartconfig配置wifi 苹果HomeKit连接控制GPIO2口，LED灯是低电平开，高电平关。
 
 本案例使用ESP8266_RTOS_SDK 2.0 小黄板 32Bit Flash
 
@@ -24,15 +24,7 @@ ESP8266-HomeKit$
 现在按照ESP8266-HomeKit-Demo wiki的说明进行操作
 
 设定您的WiFi
-如果您没有设置WiFi，请取消注释user_init例程中的第一段代码，然后填写SSID和密码，以进行设置。之后，别忘了再次将其注释掉并删除密码。Flash每次都编写它很不好，您不希望偶然将密码上传到GitHub。
-/*    wifi_set_opmode(STATION_MODE); 
-    struct station_config *sconfig = (struct station_config *)zalloc(sizeof(struct station_config));
-    sprintf(sconfig->ssid, "路由器SSID账号"); //don't forget to set this if you use it
-    sprintf(sconfig->password, "WIFI密码"); //don't forget to set this if you use it
-    wifi_station_set_config(sconfig);
-    free(sconfig);
-    wifi_station_connect(); /**/
-
+如果您没有设置WiFi，在苹果app下载ESPtouch APP配置wifi。
 
 编译中
 转到ESP8266-HomeKit-Demo目录
@@ -45,7 +37,7 @@ ESP8266-HomeKit-Demo $ cd演示
 No boot needed.
 Generate eagle.flash.bin and eagle.irom0text.bin successully in BIN_PATH
 eagle.flash.bin-------->0x00000
-eagle.irom0text.bin---->0x14000
+eagle.irom0text.bin---->0x10000
 !!!
 
 把程序下载到小黄板
