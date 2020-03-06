@@ -1,3 +1,11 @@
+###
+ # @Author: your name
+ # @Date: 2020-03-02 22:24:55
+ # @LastEditTime: 2020-03-06 20:53:33
+ # @LastEditors: your name
+ # @Description: In User Settings Edit
+ # @FilePath: /ESP8266-HomeKit/ESP8266-HomeKit-Demo/Demo/gen_misc.sh
+ ###
 #!/bin/bash
 :<<!
 ******NOTICE******
@@ -40,10 +48,10 @@ echo makeflash
 #./bin/esp_init_data_default.bin 0x3fe000 
 #./bin/blank.bin 0x01000 
 #./bin/upgrade/user1.4096.new.6.bin
-esptool.py --baud 230400 -p /dev/tty.SLAB_USBtoUART write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x10000 $BIN_PATH/eagle.irom0text.bin 0x3FE000 $BIN_PATH/blank.bin 0x3FC000 $BIN_PATH/esp_init_data_default.bin
+esptool.py --baud 230400 -p /dev/tty.SLAB_USBtoUART write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x10000 $BIN_PATH/eagle.irom0text.bin 
 echo flash 
 
 date
 ls -l $BIN_PATH/eagle.[if]*
-echo ../../../esptool/esptool.py --baud 230400 -p /dev/cu.usbserial-* write_flash 0x00000 $BIN_PATH/eagle.flash.bin 0x10000 $BIN_PATH/eagle.irom0text.bin 0x3FE000 $BIN_PATH/blank.bin 0x3FC000 $BIN_PATH/esp_init_data_default.bin
+echo ../../../esptool/esptool.py --baud 230400 -p /dev/tty.SLAB_USBtoUART write_flash 0x00000 ../../bin/eagle.flash.bin 0x10000 ../../bin/eagle.irom0text.bin
 

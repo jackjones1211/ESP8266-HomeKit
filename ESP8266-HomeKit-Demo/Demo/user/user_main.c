@@ -1,7 +1,7 @@
 /*
  * @Author: jack
  * @Date: 2020-03-03 21:05:27
- * @LastEditTime: 2020-03-04 20:20:50
+ * @LastEditTime: 2020-03-06 21:18:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ESP8266-HomeKit/ESP8266-HomeKit-Demo/Demo/user/user_main.c
@@ -102,15 +102,15 @@ void    led_task(void *arg) //make transfer of gpio via arg, starting as a stati
     int     i,original;
     cJSON   *value;
 
-    os_printf("led_task started\n");
     value=cJSON_CreateBool(0); //value doesn't matter
     while(1) {
         vTaskDelay(1500); //15 sec
         original=GPIO_INPUT(GPIO_Pin_2); //get original state
 //      os_printf("original:%d\n",original);
         value->type=original^1;
-        GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
-        change_value(    gpio2.aid,gpio2.iid,value);
+        os_printf("led_task send_events\n");
+//       GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
+//       change_value(    gpio2.aid,gpio2.iid,value);
         send_events(NULL,gpio2.aid,gpio2.iid);
     }
 }
@@ -118,15 +118,12 @@ void    led_task(void *arg) //make transfer of gpio via arg, starting as a stati
 void led(int aid, int iid, cJSON *value, int mode)
 {
     GPIO_ConfigTypeDef gpio2_in_cfg;
-
     switch (mode) {
         case 1: { //changed by gui
-            os_printf("init led mode1\n");
             char *out; out=cJSON_Print(value);  os_printf("led %s\n",out);  free(out);  // Print to text, print it, release the string.
-            if (value) GPIO_OUTPUT(GPIO_Pin_2, value->type);
+            if (value) GPIO_OUTPUT(GPIO_Pin_2,!(value->type));
         }break;
         case 0: { //init
-            os_printf("init led mode0\n");
             gpio2_in_cfg.GPIO_IntrType = GPIO_PIN_INTR_DISABLE;         //no interrupt
             gpio2_in_cfg.GPIO_Mode     = GPIO_Mode_Output;              //Output mode
             gpio2_in_cfg.GPIO_Pullup   = GPIO_PullUp_EN;                //improves transitions
@@ -152,6 +149,7 @@ void identify_task(void *arg)
     os_printf("identify_task started\n");
     while(1) {
         while(!xQueueReceive(identifyQueue,NULL,10));//wait for a queue item
+        os_printf("a queue item\n");
         original=GPIO_INPUT(GPIO_Pin_2); //get original state
         for (i=0;i<2;i++) {
             GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
