@@ -1,7 +1,14 @@
 /*
- *  Copyright 2016 HomeACcessoryKid - HacK - homeaccessorykid@gmail.com
+ * @Author: jack
+ * @Date: 2020-03-03 21:05:27
+ * @LastEditTime: 2020-03-06 21:18:42
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /ESP8266-HomeKit/ESP8266-HomeKit-Demo/Demo/user/user_main.c
+ */
+/*
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  Licensed under the Apache License, Version 2.0 (the "License")
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -53,12 +60,33 @@
  * You use aid and iid to know which characteristic to handle and cJSON for the value.
  *
  * Use iOS10 Home app or Eve or other app to test all the features and enjoy
+ * *欢迎来到HomeACcessoryKid hkc演示
+
+*通过几行代码，我们将演示如何轻松设置您的ESP8266作为附件。
+*开始在hkc_user_init中定义附件并执行其他挂起的init任务。
+*为每个服务特性定义一个回调函数。
+*将以不同模式调用ACC_回调。
+*-mode=0:初始化服务（init）
+*-mode=1：收到更改请求，您可以对其进行操作（写入）
+*-mode=2：在可能更新（读取）的位置接收刷新请求
+*回调应该很快返回，否则使用如下所示的任务。
+*如果从内部发生了变化，可以使用change_value并发送_事件作为回报。
+*您可以使用aid和iid来了解要处理的特性，并以cJSON为值。
+*使用iOS10家庭应用程序或Eve或其他应用程序测试所有功能并享受
 *****************************************************************************************/
  
 #include "esp_common.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "freertos/portmacro.h"
+
 #include "hkc.h"
 #include "gpio.h"
 #include "queue.h"
+#include "uart.h"
+#include "smart.h"
 
 xQueueHandle identifyQueue;
 
@@ -67,20 +95,22 @@ struct  gpio {
     int iid;
 } gpio2;
 
+
+
 void    led_task(void *arg) //make transfer of gpio via arg, starting as a static variable in led routine
 {
     int     i,original;
     cJSON   *value;
 
-    os_printf("led_task started\n");
     value=cJSON_CreateBool(0); //value doesn't matter
     while(1) {
         vTaskDelay(1500); //15 sec
         original=GPIO_INPUT(GPIO_Pin_2); //get original state
 //      os_printf("original:%d\n",original);
         value->type=original^1;
-        GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
-        change_value(    gpio2.aid,gpio2.iid,value);
+        os_printf("led_task send_events\n");
+//       GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
+//       change_value(    gpio2.aid,gpio2.iid,value);
         send_events(NULL,gpio2.aid,gpio2.iid);
     }
 }
@@ -88,11 +118,10 @@ void    led_task(void *arg) //make transfer of gpio via arg, starting as a stati
 void led(int aid, int iid, cJSON *value, int mode)
 {
     GPIO_ConfigTypeDef gpio2_in_cfg;
-
     switch (mode) {
         case 1: { //changed by gui
             char *out; out=cJSON_Print(value);  os_printf("led %s\n",out);  free(out);  // Print to text, print it, release the string.
-            if (value) GPIO_OUTPUT(GPIO_Pin_2, value->type);
+            if (value) GPIO_OUTPUT(GPIO_Pin_2,!(value->type));
         }break;
         case 0: { //init
             gpio2_in_cfg.GPIO_IntrType = GPIO_PIN_INTR_DISABLE;         //no interrupt
@@ -120,6 +149,7 @@ void identify_task(void *arg)
     os_printf("identify_task started\n");
     while(1) {
         while(!xQueueReceive(identifyQueue,NULL,10));//wait for a queue item
+        os_printf("a queue item\n");
         original=GPIO_INPUT(GPIO_Pin_2); //get original state
         for (i=0;i<2;i++) {
             GPIO_OUTPUT(GPIO_Pin_2,original^1); // and toggle
@@ -137,6 +167,7 @@ void identify(int aid, int iid, cJSON *value, int mode)
             xQueueSend(identifyQueue,NULL,0);
         }break;
         case 0: { //init
+         os_printf("init identify\n");
         identifyQueue = xQueueCreate( 1, 0 );
         xTaskCreate(identify_task,"identify",256,NULL,2,NULL);
         }break;
@@ -152,8 +183,8 @@ void identify(int aid, int iid, cJSON *value, int mode)
 extern  cJSON       *root;
 void    hkc_user_init(char *accname)
 {
-    //do your init thing beyond the bear minimum
-    //avoid doing it in user_init else no heap left for pairing
+    //do your init thing beyond the bear minimum 把你的第一件事做得超出最低限度
+    //avoid doing it in user_init else no heap left for pairing 避免在user_in it中执行此操作，否则将没有可用于配对的堆
     cJSON *accs,*sers,*chas,*value;
     int aid=0,iid=0;
 
@@ -172,10 +203,10 @@ void    hkc_user_init(char *accname)
     addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"led",NULL);
     addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"1",led);
     //service 2
-    chas=addService(      sers,++iid,APPLE,LIGHTBULB_S);
+/*     chas=addService(      sers,++iid,APPLE,LIGHTBULB_S);
     addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"light",NULL);
     addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"0",NULL);
-    addCharacteristic(chas,aid,++iid,APPLE, BRIGHTNESS_C,"0",NULL);
+    addCharacteristic(chas,aid,++iid,APPLE, BRIGHTNESS_C,"0",NULL); */
 
     char *out;
     out=cJSON_Print(root);  os_printf("%s\n",out);  free(out);  // Print to text, print it, release the string.
@@ -186,6 +217,25 @@ void    hkc_user_init(char *accname)
 //  }
 }
 
+/**
+ * @description: Uart0 配置波特率为 115200
+ * @param none
+ * @return: none
+ */
+void Uart0_Config(void)
+{
+     UART_ConfigTypeDef uart_config;
+    uart_config.baud_rate = BIT_RATE_115200;
+    uart_config.data_bits = UART_WordLength_8b;
+    uart_config.parity = USART_Parity_None;
+    uart_config.stop_bits = USART_StopBits_1;
+    uart_config.flow_ctrl = USART_HardwareFlowControl_None;
+    uart_config.UART_RxFlowThresh = 120;
+    uart_config.UART_InverseMask = UART_None_Inverse;
+    UART_ParamConfig(UART0, &uart_config);
+}
+
+
 /******************************************************************************
  * FunctionName : user_init
  * Description  : entry of user application, init user function here
@@ -194,8 +244,14 @@ void    hkc_user_init(char *accname)
 *******************************************************************************/
 void user_init(void)
 {   
+   
+    Uart0_Config();
     os_printf("start of user_init @ %d\n",system_get_time()/1000);
-    
+	
+    /* need to set opmode before you set config */
+    wifi_set_opmode(STATION_MODE);
+    xTaskCreate(smartconfig_task, "smartconfig_task", 256, NULL, tskIDLE_PRIORITY+3, NULL);
+
 //use this block only once to set your favorite access point or put your own selection routine
 /*    wifi_set_opmode(STATION_MODE); 
     struct station_config *sconfig = (struct station_config *)zalloc(sizeof(struct station_config));
@@ -210,6 +266,7 @@ void user_init(void)
     hkc_init("HomeACcessory");
  //   os_printf("end of user_init @ %d\n",system_get_time()/1000);
     os_printf("end of user_init @ %d\n",system_get_time()/1000);
+    //测试代码
 }
 
 /***********************************************************************************

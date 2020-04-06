@@ -80,6 +80,7 @@ LINKFLAGS_eagle.app.v6 = \
 	-lwpa	\
 	-lwps		\
 	-lhkc	\
+	-lairkiss	\
 	$(DEP_LIBS_eagle.app.v6)					\
 	-Wl,--end-group
 
