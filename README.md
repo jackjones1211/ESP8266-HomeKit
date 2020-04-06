@@ -1,7 +1,15 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-03-02 22:24:55
+ * @LastEditTime: 2020-04-06 21:16:13
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /ESP8266-HomeKit/README.md
+ -->
 # ESP8266-HomeKit
 Iphone 控制ESP8266 IO口 支持ESPtouch Smartconfig配置wifi 苹果HomeKit连接控制GPIO2口，LED灯是低电平开，高电平关。
 
-本案例使用ESP8266_RTOS_SDK 2.0 小黄板 32Bit Flash
+本案例使用ESP8266_RTOS_SDK 2.0 小黄板 32MBit Flash
 
 ESP8266-HomeKit的制作说明
 先决条件
